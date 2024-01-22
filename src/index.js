@@ -1,8 +1,9 @@
 import "dotenv/config"
+import TwilioSDK from "twilio"
 
 const accountSid = process.env.TWILIO_SID;
 const authToken = process.env.TWILIO_TOKEN;
-const client = require('twilio')(accountSid, authToken);
+const client = TwilioSDK(accountSid, authToken);
 
 client.messages
       .create({
