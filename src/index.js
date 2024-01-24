@@ -43,7 +43,7 @@ app.post("/webhook", (req, res) => {
                 .then(data => {
                     const buffer = Buffer.from(data);
 
-                    fs.writeFileSync("audio.mp3", buffer);
+                    fs.writeFileSync("src/audio/audio.mp3", buffer);
 
                     console.log("File saved successfully");
                 })
