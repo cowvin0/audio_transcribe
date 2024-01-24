@@ -26,10 +26,10 @@ export async function transcribeMoises() {
     }
 }
 
-export async function TextToSpeech(textMessage) {
+async function TextToSpeech(textMessage) {
     try {
 
-        fs.writeFile("cf.txt", textMessage, (err) => {
+        fs.writeFile("./src/text/cf.txt", textMessage, (err) => {
             if (err) throw err;
             console.log("File has been saved.");
         });
@@ -42,14 +42,15 @@ export async function TextToSpeech(textMessage) {
             "TextToAudio",
             {InputText: downloadUrl}
         );
-        console.log('Job adicionado:', jobId);
+        console.log('Added job:', jobId);
 
         const job = await moises.waitForJobCompletion(jobId);
-        console.log('Job concluído:', job);
+        console.log('Done job:', job);
 
         if (job.status === 'SUCCEEDED') {
             const files = await moises.downloadJobResults(job, './src/results');
             console.log('Arquivos baixados:', files);
+            await moises.deleteJob(jobId);
         } else{
             console.log('Job falhou:', job);
         }
@@ -58,3 +59,4 @@ export async function TextToSpeech(textMessage) {
     }
 }
 
+TextToSpeech("testando api da moises");
