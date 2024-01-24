@@ -26,7 +26,7 @@ export async function transcribeMoises() {
     }
 }
 
-async function TextToSpeech(textMessage) {
+export async function TextToSpeech(textMessage) {
     try {
 
         fs.writeFile("./src/text/cf.txt", textMessage, (err) => {
@@ -58,5 +58,3 @@ async function TextToSpeech(textMessage) {
         console.error("Error:", error)
     }
 }
-
-TextToSpeech("testando api da moises");
