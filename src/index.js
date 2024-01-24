@@ -1,18 +1,20 @@
 import express from "express";
-import axios from "axios";
 import "dotenv/config";
-import ffmpeg from "@ffmpeg-installer/ffmpeg";
+import fetch from "node-fetch";
+import fs from "fs";
 import TwilioSDK from "twilio";
-import "fluent-ffmpeg";
-import FfmpegCommand from "fluent-ffmpeg";
-import "fs";
 import bodyParser from "body-parser";
+
 const app = express();
 
 const accountSid = process.env.TWILIO_SID;
 const authToken = process.env.TWILIO_TOKEN;
 const port = process.env.PORT;
 const client = TwilioSDK(accountSid, authToken);
+const basicAuth = Buffer.from(`${accountSid}:${authToken}`).toString('base64');
+const headers = {
+  'Authorization': `Basic ${basicAuth}`
+};
 
 app.use(express.json())
 app.use(bodyParser.urlencoded({ extended: false}))
@@ -24,7 +26,6 @@ app.get("/", (req, res) => {
 app.post("/webhook", (req, res) => {
     const messageBody = req.body.Body;
     const sender = req.body.From;
-    const mediaUrl = req.body.MediaUrl0;
 
     if (req.body.NumMedia > 0) {
         const mediaUrl = req.body.MediaUrl0;
@@ -32,46 +33,51 @@ app.post("/webhook", (req, res) => {
 
         try {
 
-            // const ffmpeg = new FfmpegCommand();
-            ffmpeg()
-                .input(mediaUrl)
-                .audioCodec("libmp3lame")
-                .toFormat("mp3")
-                .on("end", async () => {
-
-                    const outputFile = "converted_audio.mp3";
-                    const outputBuffer = fs.readFileSync(outputFile);
-
-                    await client.messages
-                                .create({
-                                    body: "thanks",
-                                    from: process.env.FROM,
-                                    to: "whatsapp:+558386136318",
-                                    mediaUrl: ['data:audio/mp3;base64,' + outputBuffer.toString('base64')],
-                    });
-
-                    console.log(`Sent audio response to ${sender}`);
+            fetch(mediaUrl, { headers })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Network response was not ok: ${response.status}`);
+                    }
+                    return response.arrayBuffer();
                 })
-                .on("error", (err) => {
-                    console.log("Error converting audio:", err)
+                .then(data => {
+                    const buffer = Buffer.from(data);
+
+                    fs.writeFileSync("audio.mp3", buffer);
+
+                    console.log("File saved successfully");
                 })
-                .save("converted_audio.mp3");
+                .catch(error => {
+                    console.log("Fetch error:", error);
+                });
+
+            client.messages
+                .create({
+                    body: "Thanks, it's working now!",
+                    from: process.env.FROM,
+                    to: "whatsapp:+558386136318",
+                });
+
         } catch (error) {
             console.error(`Error handling media from ${sender}: ${error.message}`);
         }
 
-    }
-    // console.log(`Received message from ${sender}: ${messageBody}`);
-    // console.log(mediaUrl);
+    } else {
+        console.log(`Received text message from ${sender}: ${messageBody}`);
 
-    // client.messages
-    //       .create({
-    //          from: process.env.FROM,
-    //          mediaUrl: mediaUrl,
-    //          body: mediaUrl,
-    //          to: 'whatsapp:+558386136318'
-    //        })
-    //       .then(message => console.log(message.sid));
+        try {
+            client.messages
+                .create({
+                    body: "Text message received, thanks!",
+                    from: process.env.FROM,
+                    to: "whatsapp:+558386136318"
+                });
+
+            console.log(`Sent text response to ${sender}`);
+        } catch (error) {
+            console.error(`Error sending text response to ${sender}: ${error.message}`);
+        }
+    }
 
 });
 
