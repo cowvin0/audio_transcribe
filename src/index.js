@@ -1,5 +1,6 @@
 import express from "express";
 import "dotenv/config";
+import { transcribeMoises } from "./moises_api.js";
 import fetch from "node-fetch";
 import fs from "fs";
 import TwilioSDK from "twilio";
@@ -23,7 +24,7 @@ app.get("/", (req, res) => {
     res.send("Hello, this is the root route");
 })
 
-app.post("/webhook", (req, res) => {
+app.post("/webhook", async (req, res) => {
     const messageBody = req.body.Body;
     const sender = req.body.From;
 
@@ -33,7 +34,7 @@ app.post("/webhook", (req, res) => {
 
         try {
 
-            fetch(mediaUrl, { headers })
+            await fetch(mediaUrl, { headers })
                 .then(response => {
                     if (!response.ok) {
                         throw new Error(`Network response was not ok: ${response.status}`);
@@ -51,12 +52,12 @@ app.post("/webhook", (req, res) => {
                     console.log("Fetch error:", error);
                 });
 
-            client.messages
-                .create({
-                    body: "Thanks, it's working now!",
-                    from: process.env.FROM,
-                    to: "whatsapp:+558386136318",
-                });
+            await client.messages
+                    .create({
+                        body: await transcribeMoises(),
+                        from: process.env.FROM,
+                        to: sender
+            });
 
         } catch (error) {
             console.error(`Error handling media from ${sender}: ${error.message}`);
@@ -70,7 +71,7 @@ app.post("/webhook", (req, res) => {
                 .create({
                     body: "Text message received, thanks!",
                     from: process.env.FROM,
-                    to: "whatsapp:+558386136318"
+                    to: sender
                 });
 
             console.log(`Sent text response to ${sender}`);

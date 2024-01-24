@@ -4,7 +4,7 @@ import Moises from "moises/sdk.js"
 
 const moises = new Moises({ apiKey: process.env.API_KEY })
 
-async function transcribeMoises() {
+export async function transcribeMoises() {
     try {
         await moises.processFolder(
             "TesteHackTheMusic",
@@ -20,6 +20,7 @@ async function transcribeMoises() {
 
         console.log("Transcribed:", resultData[0].text);
         console.log("Detected language:", resultData[0].language);
+        return resultData[0].text;
     } catch (error) {
         console.log("Error:", error);
     }
