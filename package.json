@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "fs": "^0.0.1-security",
+    "moises": "^3.0.3"
+  },
+  "type": "module"
+}
