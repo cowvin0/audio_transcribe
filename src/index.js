@@ -1,7 +1,8 @@
 import express from "express";
 import "dotenv/config";
-import { transcribeMoises } from "./moises_api.js";
+import { convertWavToMp3, transcribeMoises, textToSpeech } from "./utils/moises.js";
 import fetch from "node-fetch";
+import { openInterpret } from "./utils/openai.js";
 import fs from "fs";
 import TwilioSDK from "twilio";
 import bodyParser from "body-parser";
@@ -10,8 +11,7 @@ const app = express();
 
 const accountSid = process.env.TWILIO_SID; const authToken = process.env.TWILIO_TOKEN; const port = process.env.PORT; const client = TwilioSDK(accountSid, authToken);
 const basicAuth = Buffer.from(`${accountSid}:${authToken}`).toString('base64');
-const headers = {
-  'Authorization': `Basic ${basicAuth}`
+const headers = { 'Authorization': `Basic ${basicAuth}`
 };
 
 app.use(express.json())
@@ -49,9 +49,19 @@ app.post("/webhook", async (req, res) => {
                     console.log("Fetch error:", error);
                 });
 
+            const questionText = await transcribeMoises();
+            const gptAnswer = await openInterpret(questionText);
+            const audioTranscribed = await textToSpeech(gptAnswer);
+            const ngrokHttps = "https://efab-45-227-107-214.ngrok-free.app/" + 
+                audioTranscribed.voice_output.replace("./", "").replace(".wav", ".mp3")
+
+            console.log("Transform audio to .mp3:", audioTranscribed);
+            await convertWavToMp3(audioTranscribed.voice_output);
+
             await client.messages
                     .create({
-                        body: await transcribeMoises(),
+                        mediaUrl: ngrokHttps,
+                        // mediaUrl: "https://efab-45-227-107-214.ngrok-free.app/src/audio/audio.mp3",
                         from: process.env.FROM,
                         to: sender
             });

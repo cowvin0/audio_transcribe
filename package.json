@@ -17,6 +17,7 @@
     "fluent-ffmpeg": "^2.1.2",
     "moises": "^3.0.3",
     "node-fetch": "^3.3.2",
+    "openai": "^4.8.0",
     "twilio": "^4.20.1",
     "uuid": "^9.0.1"
   },

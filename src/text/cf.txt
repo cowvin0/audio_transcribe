@@ -1,1 +1,10 @@
-testando api da moises
+Para enviar um contato pelo WhatsApp, siga os seguintes passos:
+
+1. Abra o aplicativo WhatsApp em seu celular.
+2. Abra a conversa na qual você deseja enviar o contato.
+3. Toque no ícone de clipe de papel, que está localizado na parte inferior da tela.
+4. Selecione a opção "Contato" ou o ícone de "Cartão de Visita".
+5. Escolha o contato que você deseja enviar da sua lista de contatos.
+6. Toque no botão de envio, que geralmente é representado por um ícone de seta ou de um aviãozinho.
+
+Pronto! O contato foi enviado para a pessoa com quem você estava conversando.
