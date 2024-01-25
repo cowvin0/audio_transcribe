@@ -1,7 +1,9 @@
 {
   "dependencies": {
+    "bard-ai": "^2.0.3",
     "fs": "^0.0.1-security",
-    "moises": "^3.0.3"
+    "moises": "^3.0.3",
+    "openai": "^4.25.0"
   },
   "type": "module"
 }
