@@ -7,10 +7,7 @@ import bodyParser from "body-parser";
 
 const app = express();
 
-const accountSid = process.env.TWILIO_SID;
-const authToken = process.env.TWILIO_TOKEN;
-const port = process.env.PORT;
-const client = TwilioSDK(accountSid, authToken);
+const accountSid = process.env.TWILIO_SID; const authToken = process.env.TWILIO_TOKEN; const port = process.env.PORT; const client = TwilioSDK(accountSid, authToken);
 const basicAuth = Buffer.from(`${accountSid}:${authToken}`).toString('base64');
 const headers = {
   'Authorization': `Basic ${basicAuth}`
