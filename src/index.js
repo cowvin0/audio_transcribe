@@ -52,7 +52,7 @@ app.post("/webhook", async (req, res) => {
             const questionText = await transcribeMoises();
             const gptAnswer = await openInterpret(questionText);
             const audioTranscribed = await textToSpeech(gptAnswer);
-            const ngrokHttps = "https://efab-45-227-107-214.ngrok-free.app/" + 
+            const ngrokHttps = "https://f61e-45-227-107-214.ngrok-free.app/" + 
                 audioTranscribed.voice_output.replace("./", "").replace(".wav", ".mp3")
 
             console.log("Transform audio to .mp3:", audioTranscribed);
@@ -61,7 +61,6 @@ app.post("/webhook", async (req, res) => {
             await client.messages
                     .create({
                         mediaUrl: ngrokHttps,
-                        // mediaUrl: "https://efab-45-227-107-214.ngrok-free.app/src/audio/audio.mp3",
                         from: process.env.FROM,
                         to: sender
             });
@@ -74,9 +73,18 @@ app.post("/webhook", async (req, res) => {
         console.log(`Received text message from ${sender}: ${messageBody}`);
 
         try {
+
+            const gptInterpret = await openInterpret(messageBody, "Forneça interpretação de texto para uma pessoa que não sabe ler. A mensagem deverá ser interpretada e explicada, dizendo o que significa. A mensagem será posteriormente passada para aúdio e a pessoa poderá compreender a sua resposta.");
+            const audioInterpret = await textToSpeech(gptInterpret);
+            const ngrokUrl = "https://f61e-45-227-107-214.ngrok-free.app/" + 
+                audioInterpret.voice_output.replace("./", "").replace(".wav", ".mp3")
+
+            console.log("Transform audio to .mp3:", audioInterpret);
+            await convertWavToMp3(audioInterpret.voice_output);
+
             client.messages
                 .create({
-                    body: "Text message received, thanks!",
+                    mediaUrl: ngrokUrl,
                     from: process.env.FROM,
                     to: sender
                 });

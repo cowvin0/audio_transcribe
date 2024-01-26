@@ -2,7 +2,6 @@ import "dotenv/config"
 import ffmpeg from "fluent-ffmpeg";
 import fs from "fs";
 import Moises from "moises/sdk.js"
-
 const moises = new Moises({ apiKey: process.env.API_KEY })
 
 export async function transcribeMoises() {
