@@ -9,7 +9,10 @@ import bodyParser from "body-parser";
 
 const app = express();
 
-const accountSid = process.env.TWILIO_SID; const authToken = process.env.TWILIO_TOKEN; const port = process.env.PORT; const client = TwilioSDK(accountSid, authToken);
+const accountSid = process.env.TWILIO_SID; 
+const authToken = process.env.TWILIO_TOKEN;
+const port = process.env.PORT;
+const client = TwilioSDK(accountSid, authToken);
 const basicAuth = Buffer.from(`${accountSid}:${authToken}`).toString('base64');
 const headers = { 'Authorization': `Basic ${basicAuth}`
 };
@@ -52,7 +55,8 @@ app.post("/webhook", async (req, res) => {
             const questionText = await transcribeMoises();
             const gptAnswer = await openInterpret(questionText);
             const audioTranscribed = await textToSpeech(gptAnswer);
-            const ngrokHttps = "https://f61e-45-227-107-214.ngrok-free.app/" + 
+            console.log(audioTranscribed);
+            const ngrokHttps = "https://b62b-45-227-107-214.ngrok-free.app/" + 
                 audioTranscribed.voice_output.replace("./", "").replace(".wav", ".mp3")
 
             console.log("Transform audio to .mp3:", audioTranscribed);
@@ -76,7 +80,7 @@ app.post("/webhook", async (req, res) => {
 
             const gptInterpret = await openInterpret(messageBody, "Forneça interpretação de texto para uma pessoa que não sabe ler. A mensagem deverá ser interpretada e explicada, dizendo o que significa. A mensagem será posteriormente passada para aúdio e a pessoa poderá compreender a sua resposta.");
             const audioInterpret = await textToSpeech(gptInterpret);
-            const ngrokUrl = "https://f61e-45-227-107-214.ngrok-free.app/" + 
+            const ngrokUrl = "https://b62b-45-227-107-214.ngrok-free.app/" + 
                 audioInterpret.voice_output.replace("./", "").replace(".wav", ".mp3")
 
             console.log("Transform audio to .mp3:", audioInterpret);
